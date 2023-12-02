@@ -1,5 +1,13 @@
-<!-- {"s_msg":"this file was automatically generated","s_by":"f_generate_markdown.module.js","s_ts_created":"Fri Dec 01 2023 23:58:56 GMT+0100 (Central European Standard Time)","n_ts_created":1701471536073} -->
+<!-- {"s_msg":"this file was automatically generated","s_by":"f_generate_markdown.module.js","s_ts_created":"Sat Dec 02 2023 16:10:37 GMT+0100 (Central European Standard Time)","n_ts_created":1701529837422} -->
+# web-ser-socket (also 'web-SIR-socket') is a small web/-server/-socket
+![](./banner_logo.png)
 ```javascript
+import {
+    f_websersocket_serve, 
+    f_v_before_return_response__fileserver,
+    f_v_before_return_response__proxy
+} from "./mod.js"
+
 let s_path_file_current = new URL(import.meta.url).pathname;
 let s_path_folder_current = s_path_file_current.split('/').slice(0, -1).join('/'); 
 // console.log(s_path_folder_current)

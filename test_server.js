@@ -1,4 +1,6 @@
 //readme.md:start
+//md: # web-ser-socket (also 'web-SIR-socket') is a small web/-server/-socket
+//md: ![](./banner_logo.png)
 import {
     f_websersocket_serve, 
     f_v_before_return_response__fileserver,
