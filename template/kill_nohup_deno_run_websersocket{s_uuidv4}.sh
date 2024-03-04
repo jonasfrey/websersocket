@@ -1,0 +1,1 @@
+pkill -f websersocket_{s_uuidv4}.js

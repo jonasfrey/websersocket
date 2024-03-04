@@ -13,6 +13,12 @@ import {
 import {
     f_s_n_beautified
 } from "https://deno.land/x/handyhelpers@2.2/mod.js"
+import { ensureDir as f_ensure_folder } from "https://deno.land/std@0.218.2/fs/ensure_dir.ts";
+
+
+
+let s_path_abs_file_current = new URL(import.meta.url).pathname;
+let s_path_abs_folder_current = s_path_abs_file_current.split('/').slice(0, -1).join('/');
 
 let f_o_ssl_config = async function (
     o_config
@@ -469,10 +475,58 @@ let f_o_response_from_o_socket = function (
     v_data
 ) {
     o_socket.send(v_data);
-
 }
 
+
+let f_a_s_path_entry = async function(s_path_abs_folder){
+    let a_s = []
+    for await (const o_entry of Deno.readDir('')) {
+        a_s.push(o_entry.name);
+        // console.log(o_entry.name);
+    }
+}
+let f_a_s_path_recursive = async function(s_path_abs_folder){
+
+};
+let f_generate_template = async function(
+    s_path_abs_folder
+){
+       
+    let o_resp = await fetch(`https://deno.land/x/websersocket`);
+    let s_url_latest = o_resp.url;
+    let s_uuidv4 = crypto.randomUUID();
+
+    let a_s_path = [
+        './template/websersocket_{s_uuidv4}.js',
+        './template/classes.module.js',
+        './template/kill_nohup_deno_run_websersocket{s_uuidv4}.sh',
+        './template/nohup_deno_run_websersocket{s_uuidv4}.sh',
+        './template/restart_nohup_run_websersocket{s_uuidv4}.sh',
+        './template/test.js',
+        './template/localhost/client.html', 
+        './template/localhost/client.module.js', 
+        './template/localhost/test_client.html', 
+        './template/localhost/test_client.module.js', 
+    ]
+    await f_ensure_folder(`${s_path_abs_folder}/localhost`);
+    for(let s of a_s_path){
+        s = s.replace('./template', './');
+        let o2 = await fetch(`https://deno.land/x/websersocket@0.2/${s}`);
+        let s_content = (await o2.text()).replaceAll('{s_uuidv4}', s_uuidv4);
+        s_content = s_content.replaceAll('{s_url_latest}', s_url_latest);
+        let s_path_abs_new = `${s_path_abs_folder}/${s}`.replaceAll('{s_uuidv4}', s_uuidv4);
+        console.log(`writing file: ${s_path_abs_new}`)
+        await Deno.writeTextFile(
+            s_path_abs_new,
+            s_content,
+        )
+    }
+    console.log('done')
+
+
+}
 export {
+    f_generate_template,
     f_websersocket_serve,
     f_v_before_return_response__fileserver,
     f_v_before_return_response__proxy
