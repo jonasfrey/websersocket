@@ -7,6 +7,22 @@ import {
     f_v_before_return_response__proxy
 } from "./mod.js"
 
+//md: ## generate template structure
+//md: this will generate a template for a websersocket including http and websocket request handling
+//md: also it includes a client front end application and client and server side testing script
+
+import {
+    f_generate_template
+} from "./mod.js"
+
+let s_path_abs_file_current = new URL(import.meta.url).pathname;
+let s_path_abs_folder_current = s_path_abs_file_current.split('/').slice(0, -1).join('/');
+await f_generate_template(`${s_path_abs_folder_current}/desired_websersocket_root_dir`);
+
+
+//md: ## examples
+//md: websersocket can be used in different ways...
+
 let s_path_file_current = new URL(import.meta.url).pathname;
 let s_path_folder_current = s_path_file_current.split('/').slice(0, -1).join('/'); 
 // console.log(s_path_folder_current)

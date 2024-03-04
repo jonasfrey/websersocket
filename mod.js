@@ -510,11 +510,14 @@ let f_generate_template = async function(
     ]
     await f_ensure_folder(`${s_path_abs_folder}/localhost`);
     for(let s of a_s_path){
-        s = s.replace('./template', './');
-        let o2 = await fetch(`https://deno.land/x/websersocket@0.2/${s}`);
+        // let s_url = `https://deno.land/x/websersocket@0.3/${s}`;
+        let s_url = `https://raw.githubusercontent.com/jonasfrey/websersocket/main/${s}`
+        console.log(s_url)
+        let o2 = await fetch(s_url);
         let s_content = (await o2.text()).replaceAll('{s_uuidv4}', s_uuidv4);
         s_content = s_content.replaceAll('{s_url_latest}', s_url_latest);
-        let s_path_abs_new = `${s_path_abs_folder}/${s}`.replaceAll('{s_uuidv4}', s_uuidv4);
+
+        let s_path_abs_new = `${s_path_abs_folder}/${s.replace('./template', './')}`.replaceAll('{s_uuidv4}', s_uuidv4);
         console.log(`writing file: ${s_path_abs_new}`)
         await Deno.writeTextFile(
             s_path_abs_new,
