@@ -3,3 +3,5 @@
 .gitignored.*/
 *gitignored*
 !*gitignored.examplenotignored*
+self_signed_cert*.crt
+self_signed_key*.key
