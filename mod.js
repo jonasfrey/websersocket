@@ -516,32 +516,120 @@ let f_generate_template = async function(
         s_uuidv4 = crypto.randomUUID();
     }
 
-    let a_s_path = [
-        './template/websersocket_{s_uuidv4}.js',
-        './template/classes.module.js',
-        './template/kill_nohup_deno_run_websersocket{s_uuidv4}.sh',
-        './template/nohup_deno_run_websersocket{s_uuidv4}.sh',
-        './template/restart_nohup_run_websersocket{s_uuidv4}.sh',
-        './template/test.js',
-        './template/.gitignore_tmp_disabled',
-        './template/o_config.gitignored.examplenotignored.json',
-        `./template/self_signed_cert_{s_uuidv4}.crt`,
-        `./template/self_signed_key_{s_uuidv4}.key`,
-        './template/functions.module.js',
-        './template/localhost/client.html', 
-        './template/localhost/client.module.js',
-        './template/localhost/test_client.html', 
-        './template/localhost/test_client.module.js', 
-    ]
+    let o_s_path_s_content = {
+        './template/websersocket_{s_uuidv4}.js': '',
+        './template/classes.module.js': '',
+        './template/kill_nohup_deno_run_websersocket{s_uuidv4}.sh': '',
+        './template/nohup_deno_run_websersocket{s_uuidv4}.sh': '',
+        './template/restart_nohup_run_websersocket{s_uuidv4}.sh': '',
+        './template/test.js': '',
+        './template/.gitignore_tmp_disabled': '',
+        './template/o_config.gitignored.examplenotignored.json': '',
+        './template/o_config.gitignored.json': '',
+//         './template/self_signed_cert_{s_uuidv4}.crt': `-----BEGIN CERTIFICATE-----
+// MIIFoTCCA4mgAwIBAgIUex9lUFqj/M8zOs2tC3nwVctSHPQwDQYJKoZIhvcNAQEL
+// BQAwYDELMAkGA1UEBhMCQ0gxFDASBgNVBAgMC1N3aXR6ZXJsYW5kMQ0wCwYDVQQH
+// DARCZXJuMRUwEwYDVQQKDAxXZWJTZXJTb2NrZXQxFTATBgNVBAMMDFdlYlNlclNv
+// Y2tldDAeFw0yNDAzMDYwOTM4NTFaFw0zNDAzMDQwOTM4NTFaMGAxCzAJBgNVBAYT
+// AkNIMRQwEgYDVQQIDAtTd2l0emVybGFuZDENMAsGA1UEBwwEQmVybjEVMBMGA1UE
+// CgwMV2ViU2VyU29ja2V0MRUwEwYDVQQDDAxXZWJTZXJTb2NrZXQwggIiMA0GCSqG
+// SIb3DQEBAQUAA4ICDwAwggIKAoICAQC+3h0/Ho5PBuvpvy/z8y/iVGR80xHYJcfL
+// E6kuTL6Isrzf1Z3O0RoQioyUybJM/hSZaMYL2HknwBh/4ArmyuDkbt8sNQL5m0C1
+// W2OVwjJnBdu6SsYN4vZeciATLCR/rjZFZSHS5ju0L8s8XG8Kyrx/EgJ7CsPch4J+
+// DYPI7SDwMriSHwX+bfu96N7SgMcpl/O1JqW93mrWCIlwxOqPuTifUlt1uVomYgic
+// 6dRzwYFc6WF2r/5mGV+6YSjgrgO/qymNCYQD9f7AnRcDu+gTOPC2qRGre7RKajj9
+// RiNQ/VgXSBteYDnIpRPUb8fWBdKeou1jwRazeHC7lh+NSz2reIbOVeUuBk+9usDH
+// rh/ZMpOegL3zuZQHSm11QFb3lzzISGaLBl/EPpHI8iSqjUKBTk4oFi7PVwoojvvW
+// irUKbJvzyeCxN8EVXTrNYSt8sUd+8C9Ge5qE8m2drX8g/rwmPl/XT/1P6JbyPb/u
+// u4bUhP6ox36FUt4QLkg3nXRz7EsbzUMLn9sdM6H+NQ0kcI84PsUVpwgKkJJFGDPs
+// vTCQcqELt758WyHxF7CgLy/3TxAh1aCbQ5JVfK+UJ3TqcuITfJ8khcQxdWztOGeH
+// Xtq28vXimNoTSBryOKM3SrNGu0iQ34jQ9Vgt7g/5+NbhlQwkGXS3vKL/+rYe1dJO
+// kO3JcfIHeQIDAQABo1MwUTAdBgNVHQ4EFgQU+uVWy0UH0f2eeYnw5t49LS2pyjQw
+// HwYDVR0jBBgwFoAU+uVWy0UH0f2eeYnw5t49LS2pyjQwDwYDVR0TAQH/BAUwAwEB
+// /zANBgkqhkiG9w0BAQsFAAOCAgEAvWG/DCt0JQ+/OxYWfUYXub0u5x2l8p2bSkI+
+// iM3oGfhvpsATiyKr2K+CneL/lq4gOJe8oENfX9iV7NGzmMi0cLdbXscR7TQH7G+4
+// SoMILaxNvFETcXzOKQXPPTewNJzP7IByvPjiViewSZSKB9CFpQGEVPjvIRP9TkSY
+// C5ikn2jC3wiHRPpq6j7pHkeP+gGdFjcz/Cr8g1mwAB0bdayGPf2m0Dzqu0bcC81F
+// stbeGzq6YjFRTbyJgkN62FiwPlFO3wF0GEjuJ7odzsug/UAv1BorADHNAhlgxxbg
+// pb59a0mhNPDPqTx0znaRtEHgCpJecNqp4fNuKXpjbmTwBvIQ3OKKJjgw3k7w5Zro
+// 9Tor7WsLKeoxeb1Ge8lU3BdVKsXkuX/Z+u/eSexJ0kK6edsdtN4wjsZ5MdO8MC6d
+// WgmSsKgkjOFyliHku+o79W9fKxe4QY4VB0oM6x9IqbNyVMaVIKZdTpIsfd217aZL
+// DWhGoJQ/iUk4+CoMOlkW+fq8K8vjgsvRAgct2DBVJ8/kBHEnpyil/UUr98nA4jJ1
+// PrfB2zQwNMWFuN58J5+kFLL5/v6VrL5b3MPrZVoYBY5Wb7XssWuNxLL3pAmYQYNu
+// 59bAr0Lbdtz9YB01sKrgeT/zZoKHUvZImP1E5zEkOEdX33XidKULpt7BwUCJVpBX
+// aA9oyOA=
+// -----END CERTIFICATE-----`,
+//         './template/self_signed_key_{s_uuidv4}.key': `-----BEGIN PRIVATE KEY-----
+// MIIJQwIBADANBgkqhkiG9w0BAQEFAASCCS0wggkpAgEAAoICAQC+3h0/Ho5PBuvp
+// vy/z8y/iVGR80xHYJcfLE6kuTL6Isrzf1Z3O0RoQioyUybJM/hSZaMYL2HknwBh/
+// 4ArmyuDkbt8sNQL5m0C1W2OVwjJnBdu6SsYN4vZeciATLCR/rjZFZSHS5ju0L8s8
+// XG8Kyrx/EgJ7CsPch4J+DYPI7SDwMriSHwX+bfu96N7SgMcpl/O1JqW93mrWCIlw
+// xOqPuTifUlt1uVomYgic6dRzwYFc6WF2r/5mGV+6YSjgrgO/qymNCYQD9f7AnRcD
+// u+gTOPC2qRGre7RKajj9RiNQ/VgXSBteYDnIpRPUb8fWBdKeou1jwRazeHC7lh+N
+// Sz2reIbOVeUuBk+9usDHrh/ZMpOegL3zuZQHSm11QFb3lzzISGaLBl/EPpHI8iSq
+// jUKBTk4oFi7PVwoojvvWirUKbJvzyeCxN8EVXTrNYSt8sUd+8C9Ge5qE8m2drX8g
+// /rwmPl/XT/1P6JbyPb/uu4bUhP6ox36FUt4QLkg3nXRz7EsbzUMLn9sdM6H+NQ0k
+// cI84PsUVpwgKkJJFGDPsvTCQcqELt758WyHxF7CgLy/3TxAh1aCbQ5JVfK+UJ3Tq
+// cuITfJ8khcQxdWztOGeHXtq28vXimNoTSBryOKM3SrNGu0iQ34jQ9Vgt7g/5+Nbh
+// lQwkGXS3vKL/+rYe1dJOkO3JcfIHeQIDAQABAoICAGb8rkc6k4rsryqm8Jbu5y12
+// X+pCcWRxrkZTS3wiCMT1vJgCSW4owamfOI+n7T9B8Zd9Qy9tFKJwMkf9eaRiX8qi
+// UGUoDXzlWpsAvtE1wcB5FsCETC1+A3WemtP9g4wpUjtLgF6twBVPnJfrQDdQgTkH
+// XLNLcbdynuSpIiyuVpGErLabar6IVcd4+ZIXzl8REHz0Z4X1lyv52z8v4Wi/hl/h
+// LlxtMMl5KDCSswHqrYSWoPJLsDcjBdYpSsdA3eDz2C2zrrn8aANCQALRxz1oAept
+// e41N6FAm1K1ExRWUPY4CaFIaFdO/zt1XmzpOVgEm5HRo4XjhSeLN9CRnLtVw6TtI
+// bDqs/HGgtsLXydcN38ltd6Ifl5628cvGt62DQjOe4BBjBAz6+wD6Q3Xzq8mrR+dT
+// hwODp3qZ5aE8uhOXeNQ+M36aq0k8mXXI3NCj8qfyK+RxEvnZJCZKaL2J9EIdUPjA
+// YVKNzsmwEhM/XfH+RcAJCWY28dl/ulwDe7ga34QwJLP/radZiAliElTy6RS6uC5i
+// wk5CKlhLCjAYx0/ku+qXEe6jwSBEFk62hM00YO/sX2Eaid4RRH8ER+D3yzxS/SRM
+// Qj6l6lBE7kE7AzTH+dJuZiMiIRpzKzjtmIf7TYdIYDvlvMD81EB/hlxDHu9LGqni
+// ElrD4/v3XZLUwkp5E+yhAoIBAQD3UjjMXbxBUWWI/W+6LSg+23sw1PdN99QoSmjd
+// HuC1jMCIBx2XK9niC2OFE8v1k9U7u+SbXK1jpo8T+5AHWt99pJI4AtZQxeEMMR3r
+// dJF6jz82I//fVNBE/7pLwBPuIZjKcZaLFrQCnNhpDjgqypDR/diGYJ651J66JO1U
+// xuDD5kATpBwSU4oK8tc2JXakGmvIdxMRQNIGipSBSbtBLeYKpoLqMnadHFKagR4y
+// qczxumgr28Bku2hraHM++wGc/iRMaUm7kNr/vUZKRfMFK4ltqz8HVC8ofdU3yEiT
+// omL6ngadTKq9iNnVTocDhWqmtU4Vr7ohStniu83rWLyAa52dAoIBAQDFkL/Ka96Z
+// 2bCo4wDOFG4VDPCvXPsPaJfWmCG1jtypzU0VrP151Vz2YZVIIyUDlLtz0hBuXjjj
+// xvG0APyXozCYr1ZzoeW+f2rjk1ev5MQo7pYGhxsacAqXdaDbBSKA/Ec6ZnLnMwRH
+// 0n0RYVVccxa1R1gjfiZBRRuLwliEFrSELgq+uDEEeBaWSmDhpKxWEurjEG5SU/6T
+// rYVUGZ6fReQqtUY9NE+C6jqi8roPT1KUID+7tTAjlzb6nqJ/LTCcRv3ApClUEQw/
+// P8ab/5O8G/ZkgB3Y0Rh8czEK7fbJTwbq/L3+Yy0shdAWRz57uhtTJAiJki+x5qFB
+// ucdb5DKFQ5iNAoIBAQDQDDCPagKlB63cESXdfYMvbT4yE9R9mA62XfHcoM7yqhaD
+// 10iDFHZS+rWbCs42JUfo2eQy9UE+ZKxTaPj91unOLZR63ZgflnX75Y1/ti1y5fGM
+// v7fMzPHuORkkA85AMa7wDaFQG6cN05cQuM9y37f3jgyI7dpYBI4JlGq5OBt3b8dT
+// PmgG2pNzJlj3yYgF/9vPZKt7hgWnTwghwj5tVAkByJS0IgM5osuyAQ/AGqq2ZdKf
+// oloz4pqyT8kyn7/5qqgqRx+pUu+G1le8vx7xqHAQ+08oAR8ydrfYFvlGiAGvRSPX
+// StkOW4KzNz3ILoFK/5VSFOMEgozLeKR+Z8UaWmzZAoIBAAFz+RUiCfcTtMrpMH5T
+// hCO/fp2rj2UjncpEQCs3q8PL8L8yEIMu4IonWZO4PnNySpalet107/Is6mYqg7ER
+// 0C+vSnF7RVdLVJvr3385rX+nkY7mu3pMTKekg9RYi1JriJKTYlD0/RkSIT1Ze+k8
+// J3SZ27oXGWztdzBl84S1Lgqy0/1nGWUxBOmCDohaT7IqXXPiEQ2l9H9djVd7AMGn
+// H/B4eNXGZrdNxbShGGE4ciEIw687u+jnGc5qEEPjLzJXC1K5Ylxt66sjavCGxq1h
+// f0Rp9M49a3Ku3jN4YJJGdISR60vNqu1i5o7jY0BBtCW+ZBmu647hZVo4ZZD1crGs
+// N5kCggEBAJtV1ysqZ6B0NnNL7IJqY7Aj5Oer5xRjpoGV7EFbgfEnV7nO315YVxqh
+// 9hfGnfW0zdQ4ctEniY02cgskPKtJ5tsBMXkZqPAZLUKnBQiKQ6frfO1GxielecMp
+// GThsXQPq1auPhhHclemdZ8EqfdFcIsKTJ9llr0fX1ugb4V+GKKgR4xCC78K07zWQ
+// V8j+GSz/b0SZUlBRFwsLSaU0nedFm57keWScyul3F5Yjgl2qiKkrqx97BqHe0gbD
+// kDJiPAYyqFE9oDEWS2Z2pwyqgA14aC4GOvAS8zbeURjJ4z1OhluTRK/9WBvg8loL
+// 9kLIzR1xmZIpP8vAKCvSqlo48OYPIyw=
+// -----END PRIVATE KEY-----`,
+        // './template/self_signed_cert_{s_uuidv4}.crt':'',
+        // './template/self_signed_key_{s_uuidv4}.key':'',
+        './template/functions.module.js': '',
+        './template/localhost/client.html': '',
+        './template/localhost/client.module.js': '',
+        './template/localhost/test_client.html': '',
+        './template/localhost/test_client.module.js': ''
+    }
     await f_ensure_folder(`${s_path_abs_folder}/localhost`);
-    for(let s of a_s_path){
-        // let s_url = `https://deno.land/x/websersocket@0.3/${s}`;
-        let s_url = `${s_url_folder_gitrepo}/${s}`
-        console.log(s_url)
-        let o2 = await fetch(s_url);
-        let s_content = (await o2.text()).replaceAll('{s_uuidv4}', s_uuidv4);
-        s_content = s_content.replaceAll('{s_url_latest}', s_url_latest);
-
+    for(let s in o_s_path_s_content){
+        let s_content = o_s_path_s_content[s];
+        if(s_content.trim() == ''){
+            // let s_url = `https://deno.land/x/websersocket@0.3/${s}`;
+            let s_url = `${s_url_folder_gitrepo}/${s}`
+            console.log(s_url)
+            let o2 = await fetch(s_url);    
+            s_content = (await o2.text()).replaceAll('{s_uuidv4}', s_uuidv4);
+            s_content = s_content.replaceAll('{s_url_latest}', s_url_latest);
+        }    
 
         // the gitignore has to be handled specially since if it would be named '.gitignore' it would not get commited to the git directory
         if(s == './template/.gitignore_tmp_disabled'){
