@@ -492,10 +492,25 @@ let f_generate_template = async function(
     s_path_abs_folder
 ){
        
+    let s_url_folder_gitrepo = `https://raw.githubusercontent.com/jonasfrey/websersocket/main`
+
     let o_resp = await fetch(`https://deno.land/x/websersocket`);
     let s_url_latest = o_resp.url;
-    let s_uuidv4 = crypto.randomUUID();
     
+    let s_path_rel_file_config = './o_config.gitignored.json'
+    let s_uuidv4 = crypto.randomUUID();
+    try {
+        s_uuidv4 = JSON.parse(
+            await Deno.readTextFile(
+                `${s_path_abs_folder}/${s_path_rel_file_config}`
+            )
+        )?.s_uuidv4
+        throw Error(`template was already generated for s_uuidv4:${s_uuidv4}`)
+    } catch (error) {
+        // config file does not exist yet, 
+        s_uuidv4 = crypto.randomUUID();
+    }
+
     let a_s_path = [
         './template/websersocket_{s_uuidv4}.js',
         './template/classes.module.js',
@@ -503,6 +518,10 @@ let f_generate_template = async function(
         './template/nohup_deno_run_websersocket{s_uuidv4}.sh',
         './template/restart_nohup_run_websersocket{s_uuidv4}.sh',
         './template/test.js',
+        './template/.gitignore_tmp_disabled',
+        './template/o_config.gitignored.examplenotignored.json',
+        `./template/${s_path_rel_file_config}`,
+        './template/functions.module.js',
         './template/localhost/client.html', 
         './template/localhost/client.module.js', 
         './template/localhost/test_client.html', 
@@ -511,12 +530,18 @@ let f_generate_template = async function(
     await f_ensure_folder(`${s_path_abs_folder}/localhost`);
     for(let s of a_s_path){
         // let s_url = `https://deno.land/x/websersocket@0.3/${s}`;
-        let s_url = `https://raw.githubusercontent.com/jonasfrey/websersocket/main/${s}`
+        let s_url = `${s_url_folder_gitrepo}/${s}`
         console.log(s_url)
         let o2 = await fetch(s_url);
         let s_content = (await o2.text()).replaceAll('{s_uuidv4}', s_uuidv4);
         s_content = s_content.replaceAll('{s_url_latest}', s_url_latest);
 
+
+        // the gitignore has to be handled specially since if it would be named '.gitignore' it would not get commited to the git directory
+        if(s == './template/.gitignore_tmp_disabled'){
+            s = './template/.gitignore'
+        }
+                
         let s_path_abs_new = `${s_path_abs_folder}/${s.replace('./template', './')}`.replaceAll('{s_uuidv4}', s_uuidv4);
         console.log(`writing file: ${s_path_abs_new}`)
         await Deno.writeTextFile(
@@ -524,8 +549,8 @@ let f_generate_template = async function(
             s_content,
         )
     }
-    console.log('done')
 
+    console.log('done')
 
 }
 export {

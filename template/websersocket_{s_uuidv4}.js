@@ -2,11 +2,13 @@
 import {
     f_websersocket_serve,
     f_v_before_return_response__fileserver
-} from "{s_url_latest}"
+} from "{s_url_latest}/mod.js"
 
 import {
     O_ws_client
 } from "./classes.module.js"
+
+import { f_o_config } from "./functions.module.js";
 
 
 let s_path_abs_file_current = new URL(import.meta.url).pathname;
@@ -14,6 +16,9 @@ let s_path_abs_folder_current = s_path_abs_file_current.split('/').slice(0, -1).
 const b_deno_deploy = Deno.env.get("DENO_DEPLOYMENT_ID") !== undefined;
 
 let a_o_ws_client = []
+
+let o_config = await f_o_config();
+console.log({o_config});
 
 let f_handler = async function(o_request){
 
