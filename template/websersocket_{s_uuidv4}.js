@@ -81,7 +81,10 @@ let f_handler = async function(o_request){
 let s_name_host = Deno.hostname(); // or maybe some ip adress 112.35.8.13
 let b_development = s_name_host != 'the_server_name_here';
 let s_name_host2 = (b_development) ? 'localhost': s_name_host;
-
+let o_info_certificates = {
+    s_path_certificate_file: './self_signed_cert_{s_uuidv4}.crt',
+    s_path_key_file: './self_signed_key_{s_uuidv4}.key'
+}
 await f_websersocket_serve(
     [
         {
@@ -92,12 +95,12 @@ await f_websersocket_serve(
         },
         ...[
             (!b_deno_deploy) ? {
+                ...o_info_certificates,
                 n_port: 8443,
                 b_https: true,
                 s_hostname: s_name_host,
                 f_v_before_return_response: f_handler
             } : false
-        ].filter(v=>v)
-        
+        ].filter(v=>v)   
     ]
 );

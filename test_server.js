@@ -17,7 +17,8 @@ import {
 
 let s_path_abs_file_current = new URL(import.meta.url).pathname;
 let s_path_abs_folder_current = s_path_abs_file_current.split('/').slice(0, -1).join('/');
-await f_generate_template(`${s_path_abs_folder_current}/desired_websersocket_root_dir`);
+// await f_generate_template(`${s_path_abs_folder_current}/desired_websersocket_root_dir`);
+await f_generate_template(`./desired_websersocket_root_dir`);
 
 
 //md: ## examples

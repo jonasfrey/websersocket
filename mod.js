@@ -4,6 +4,8 @@ import {
     f_o_command
 } from "https://deno.land/x/o_command@0.9/mod.js"
 
+import { isAbsolute as f_b_path_is_absolute } from "https://deno.land/std@0.50.0/path/posix.ts";
+
 import { contentType as f_s_response_header_content_type__from_s } from "https://deno.land/std@0.208.0/media_types/content_type.ts";
 
 import {
@@ -478,20 +480,19 @@ let f_o_response_from_o_socket = function (
 }
 
 
-let f_a_s_path_entry = async function(s_path_abs_folder){
-    let a_s = []
-    for await (const o_entry of Deno.readDir('')) {
-        a_s.push(o_entry.name);
-        // console.log(o_entry.name);
-    }
-}
-let f_a_s_path_recursive = async function(s_path_abs_folder){
 
-};
 let f_generate_template = async function(
     s_path_abs_folder
 ){
-       
+    if(!f_b_path_is_absolute(s_path_abs_file_current)){
+        throw Error(`${s_path_abs_folder} path has to be absolute!`)
+    }
+
+    let b = await prompt(`do you really want to initialize a template in the directory '${s_path_abs_folder}':?`, 'y')
+        == 'y';
+    if(!b){
+        Deno.exit(1)
+    }
     let s_url_folder_gitrepo = `https://raw.githubusercontent.com/jonasfrey/websersocket/main`
 
     let o_resp = await fetch(`https://deno.land/x/websersocket`);
@@ -500,12 +501,16 @@ let f_generate_template = async function(
     let s_path_rel_file_config = './o_config.gitignored.json'
     let s_uuidv4 = crypto.randomUUID();
     try {
-        s_uuidv4 = JSON.parse(
-            await Deno.readTextFile(
-                `${s_path_abs_folder}/${s_path_rel_file_config}`
-            )
-        )?.s_uuidv4
-        throw Error(`template was already generated for s_uuidv4:${s_uuidv4}`)
+        let s_json = await Deno.readTextFile(
+            `${s_path_abs_folder}/${s_path_rel_file_config}`
+        )
+        // console.log({s_json})
+        let o = JSON.parse(
+            s_json
+        )
+        // console.log(o.s_uuidv4);
+        console.log(`template was already generated for s_uuidv4:'${s_uuidv4}'`)
+        Deno.exit(1)
     } catch (error) {
         // config file does not exist yet, 
         s_uuidv4 = crypto.randomUUID();
@@ -520,10 +525,11 @@ let f_generate_template = async function(
         './template/test.js',
         './template/.gitignore_tmp_disabled',
         './template/o_config.gitignored.examplenotignored.json',
-        `./template/${s_path_rel_file_config}`,
+        `./template/self_signed_cert_{s_uuidv4}.crt`,
+        `./template/self_signed_key_{s_uuidv4}.key`,
         './template/functions.module.js',
         './template/localhost/client.html', 
-        './template/localhost/client.module.js', 
+        './template/localhost/client.module.js',
         './template/localhost/test_client.html', 
         './template/localhost/test_client.module.js', 
     ]
