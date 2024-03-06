@@ -67,6 +67,9 @@ o_canvas.width = window.innerWidth
 o_canvas.height = window.innerHeight
 document.body.appendChild(o_canvas);
 
+
+let n_len_a_o_trn = 50;
+let n_idx_a_o_trn = 0;
 let o_gpu_gateway = f_o_gpu_gateway(
     o_canvas, 
     `#version 300 es
@@ -82,25 +85,64 @@ let o_gpu_gateway = f_o_gpu_gateway(
     out vec4 fragColor;
     uniform float n_ms_time;
     uniform vec2 o_trn_nor_mouse;
-    uniform vec2 o_trn_nor_mouse__last;
+    uniform vec2 o_trn_nor_mouse_last;
+    uniform vec2 o_trn_nor_mouse_follow;
     uniform vec2 o_scl_canvas;
+    uniform vec4 a_o_trn[${n_len_a_o_trn}];
     void main() {
-        float nt = n_ms_time *.0001;
+        float nt = n_ms_time *.001;
         vec2 o_trn_nor_p = o_trn_nor_pixel * vec2(1., o_scl_canvas.y/o_scl_canvas.x);
         vec2 o_trn_nor_m = (o_trn_nor_mouse -.5) * vec2(1., o_scl_canvas.y/o_scl_canvas.x);
-        vec2 o_trn_nor_ml = (o_trn_nor_mouse__last -.5) * vec2(1., o_scl_canvas.y/o_scl_canvas.x);
+        vec2 o_trn_nor_ml = (o_trn_nor_mouse_last -.5) * vec2(1., o_scl_canvas.y/o_scl_canvas.x);
+        vec2 o_trn_nor_follow = (o_trn_nor_mouse_follow -.5) * vec2(1., o_scl_canvas.y/o_scl_canvas.x);
+        vec2 o_trn = (a_o_trn[0].xy -.5) * vec2(1., o_scl_canvas.y/o_scl_canvas.x);
+        float n_min = 2.;
+        float n_prod = 1.;
+        float n_it_min = 0.;
+        float n_sum = 0.;
+        float n_its = ${n_len_a_o_trn}.;
+        for(float n_it = 0.; n_it < n_its; n_it+=1.){
+            vec2 oa = a_o_trn[int(n_it)].xy;
+            vec2 o_trn = (oa -.5) * vec2(1., o_scl_canvas.y/o_scl_canvas.x);
+            float n_it_nor = n_it / n_its;
+            float n = length(o_trn_nor_p-o_trn);
+            n = pow(abs((n*(20.*n_it_nor+2.)-.5)), 1./10.);
+            n_sum+=n;
+            n_prod *= (n);
+            if(n < n_min){
+                n_min = n; 
+                n_it_min = n_it;
+            }
+        }
+
         float n_len_mouse_delta =  length(o_trn_nor_m-o_trn_nor_ml);
-        float n_len_diff_mp = length(o_trn_nor_p-o_trn_nor_m);
-        
+        float n_len_diff_mp = length(o_trn_nor_p-o_trn);
+        float n2 = length(o_trn_nor_p-o_trn_nor_follow);
+        // float n_freq = n_len_mouse_delta;
+        float n_freq = 2.;
+        n_len_mouse_delta *= 20.;
+        float n_res = n_prod;
+        n_len_diff_mp = n_res;
+
         fragColor = vec4(
-            sin(n_len_diff_mp*33.+.1*n_len_mouse_delta+nt),
-            sin(n_len_diff_mp*33.-.1*n_len_mouse_delta+nt),
-            sin(n_len_diff_mp*33.+.0+nt),
+            // 1.-vec3(n_res),
+            // n_len_mouse_delta,
+            // n_prod,
+            sin(n_len_diff_mp*n_freq+.5*n_len_mouse_delta+nt),
+            sin(n_len_diff_mp*n_freq-.5*n_len_mouse_delta+nt),
+            sin(n_len_diff_mp*n_freq+.0+nt),
             1.
         );
     }
     `,
 )
+var a_o_trn = new Float32Array(new Array(n_len_a_o_trn*4).fill(0));
+var buffer = o_gpu_gateway.o_ctx.createBuffer();
+o_gpu_gateway.o_ctx.bindBuffer(o_gpu_gateway.o_ctx.ARRAY_BUFFER, buffer);
+o_gpu_gateway.o_ctx.bufferData(o_gpu_gateway.o_ctx.ARRAY_BUFFER, a_o_trn, o_gpu_gateway.o_ctx.STATIC_DRAW);
+var o_location_a_o_trn = o_gpu_gateway.o_ctx.getUniformLocation(o_gpu_gateway.o_shader__program, 'a_o_trn');
+o_gpu_gateway.o_ctx.uniform4fv(o_location_a_o_trn, a_o_trn);
+
 
 let f_resize = ()=>{
     o_canvas.width = window.innerWidth
@@ -120,6 +162,30 @@ f_resize()
 
 let n_id_raf = 0;
 let f_raf = function(){
+    if(n_id_raf%10== 0){
+        n_idx_a_o_trn = (n_idx_a_o_trn+1)%(a_o_trn.length/4);
+    }
+
+
+    let o_dir = [
+        o_state.o_trn_nor_mouse[0] - o_state.o_trn_nor_mouse_follow[0],
+        o_state.o_trn_nor_mouse[1] - o_state.o_trn_nor_mouse_follow[1],
+    ];
+    let n_t = 0.2;
+    o_state.o_trn_nor_mouse_follow = [
+        o_state.o_trn_nor_mouse_follow[0] + n_t*o_dir[0],
+        o_state.o_trn_nor_mouse_follow[1] + n_t*o_dir[1],
+    ]
+    f_update_data_in_o_gpu_gateway(
+        {
+            o_trn_nor_mouse_follow: o_state.o_trn_nor_mouse_follow
+        }, 
+        o_gpu_gateway, 
+    )
+    
+    a_o_trn[n_idx_a_o_trn*4+0] = o_state.o_trn_nor_mouse_follow[0]
+    a_o_trn[n_idx_a_o_trn*4+1] = o_state.o_trn_nor_mouse_follow[1]
+    o_gpu_gateway.o_ctx.uniform4fv(o_location_a_o_trn, a_o_trn);
     n_id_raf = window.requestAnimationFrame(f_raf);
     f_update_data_in_o_gpu_gateway(
         {
@@ -167,30 +233,35 @@ o_ws.onmessage = function(o_e) {
     o_state?.o_js__a_o_mod?._f_render();
 
 };
-
+window.addEventListener('pointerdown', (o_e)=>{
+    o_ws.send('pointerdown on client')
+})
 // To close the WebSocket
 // o_ws.close();
 
 let o_state = {
     s_msg: '', 
     a_o_msg: [], 
-    o_trn_nor_mouse__last: [.5,.5],
-    o_trn_nor_mouse: [.5,.5]
+    o_trn_nor_mouse_last: [.5,.5],
+    o_trn_nor_mouse: [.5,.5], 
+    o_trn_nor_mouse_follow: [0.,0.]
 }
 window.o_state = o_state
+
 window.addEventListener('pointermove', (o_e)=>{
     o_state.o_trn_nor_mouse = [
         (o_e.clientX / window.innerWidth), 
         1.-(o_e.clientY / window.innerHeight), 
     ];
+
     f_update_data_in_o_gpu_gateway(
         {
-            o_trn_nor_mouse: o_state.o_trn_nor_mouse__last,
-            o_trn_nor_mouse__last: o_state.o_trn_nor_mouse
+            o_trn_nor_mouse: o_state.o_trn_nor_mouse_last,
+            o_trn_nor_mouse_last: o_state.o_trn_nor_mouse, 
         }, 
         o_gpu_gateway, 
     )
-    o_state.o_trn_nor_mouse__last = o_state.o_trn_nor_mouse
+    o_state.o_trn_nor_mouse_last = o_state.o_trn_nor_mouse
 })
 
 // //readme.md:start
@@ -219,10 +290,6 @@ document.body.appendChild(
                                                 a_o: [
                                                     {
                                                         innerText: o.s_msg
-                                                    },
-                                                    {
-                                                        style: 'color: darkgray;padding-left: 1rem; font-size:10px',
-                                                        innerText: new Date(o.n_ts_ms).toISOString()
                                                     }
                                                 ]
                                             }

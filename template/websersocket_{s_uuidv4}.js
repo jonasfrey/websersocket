@@ -36,11 +36,17 @@ let f_handler = async function(o_request){
         a_o_ws_client.push(o_ws_client);
 
         o_socket.addEventListener("open", (o_e) => {
-            o_socket.send('eventlistener "open" was called on server')
+            console.log({
+                o_e, 
+                s: 'o_socket.open called'
+            })
         });
 
         o_socket.addEventListener("message", async (o_e) => {
-            console.log('eventlistener "message" was called on server')
+            console.log({
+                o_e, 
+                s: 'o_socket.message called'
+            })
             let v_data = o_e.data;
             a_o_ws_client
                 .filter(o=>o!=o_ws_client)  // send to all other clients, comment out to send to all clients
@@ -51,7 +57,10 @@ let f_handler = async function(o_request){
         });
         o_socket.addEventListener("close", async (event) => {
             a_o_ws_client.splice(a_o_ws_client.indexOf(o_ws_client), 1);
-            console.log('eventlistener "close" was called on server')
+            console.log({
+                o_e, 
+                s: 'o_socket.close called'
+            })
         });
 
         return o_response;
