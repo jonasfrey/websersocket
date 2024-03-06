@@ -1,6 +1,7 @@
 import {
     f_display_test_selection_or_run_selected_test_and_print_summary,
-    f_o_test
+    f_o_test, 
+    f_assert_equals
 } from "https://deno.land/x/deno_test_server_and_client_side@1.1/mod.js"
 
 //readme.md:start
@@ -15,12 +16,12 @@ import {
 
 let a_o_test = [
     f_o_test(
-        'basic_example_convert_js_to_html', 
+        'assert_equals_1_eq_1', 
         async ()=>{
             //./readme.md:start
             //md: ## most simple example 
             //md: description
-            f_asser_equals(1,1);
+            f_assert_equals(1,1);
             //./readme.md:end
         }
     ),

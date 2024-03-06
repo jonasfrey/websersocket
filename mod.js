@@ -627,7 +627,7 @@ let f_generate_template = async function(
             let s_url = `${s_url_folder_gitrepo}/${s}`
             console.log(s_url)
             let o2 = await fetch(s_url);    
-            s_content = (await o2.text()).replaceAll('{s_uuidv4}', s_uuidv4);
+            s_content = (await (o2.text())).replaceAll('{s_uuidv4}', s_uuidv4);
             s_content = s_content.replaceAll('{s_url_latest}', s_url_latest);
         }    
 

@@ -55,7 +55,7 @@ let f_handler = async function(o_request){
 
                 })
         });
-        o_socket.addEventListener("close", async (event) => {
+        o_socket.addEventListener("close", async (o_e) => {
             a_o_ws_client.splice(a_o_ws_client.indexOf(o_ws_client), 1);
             console.log({
                 o_e, 
