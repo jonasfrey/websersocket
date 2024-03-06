@@ -82,20 +82,27 @@ let o_gpu_gateway = f_o_gpu_gateway(
     out vec4 fragColor;
     uniform float n_ms_time;
     uniform vec2 o_trn_nor_mouse;
-    uniform vec2 o_trn_nor_mouse__last;
+    uniform vec2 o_trn_nor_mouse_last;
+    uniform vec2 o_trn_nor_mouse_follow;
     uniform vec2 o_scl_canvas;
     void main() {
-        float nt = n_ms_time *.0001;
+        float nt = n_ms_time *.001;
         vec2 o_trn_nor_p = o_trn_nor_pixel * vec2(1., o_scl_canvas.y/o_scl_canvas.x);
         vec2 o_trn_nor_m = (o_trn_nor_mouse -.5) * vec2(1., o_scl_canvas.y/o_scl_canvas.x);
-        vec2 o_trn_nor_ml = (o_trn_nor_mouse__last -.5) * vec2(1., o_scl_canvas.y/o_scl_canvas.x);
+        vec2 o_trn_nor_ml = (o_trn_nor_mouse_last -.5) * vec2(1., o_scl_canvas.y/o_scl_canvas.x);
+        vec2 o_trn_nor_follow = (o_trn_nor_mouse_follow -.5) * vec2(1., o_scl_canvas.y/o_scl_canvas.x);
         float n_len_mouse_delta =  length(o_trn_nor_m-o_trn_nor_ml);
-        float n_len_diff_mp = length(o_trn_nor_p-o_trn_nor_m);
-        
+        float n_len_diff_mp = length(o_trn_nor_p-o_trn_nor_follow);
+        float n2 = length(o_trn_nor_p-o_trn_nor_follow);
+        // float n_freq = n_len_mouse_delta;
+        float n_freq = 33.;
+        n_len_mouse_delta *= 100.;
         fragColor = vec4(
-            sin(n_len_diff_mp*33.+.1*n_len_mouse_delta+nt),
-            sin(n_len_diff_mp*33.-.1*n_len_mouse_delta+nt),
-            sin(n_len_diff_mp*33.+.0+nt),
+            // vec3(n2),
+            // n_len_mouse_delta,
+            sin(n_len_diff_mp*n_freq+.1*n_len_mouse_delta+nt),
+            sin(n_len_diff_mp*n_freq-.1*n_len_mouse_delta+nt),
+            sin(n_len_diff_mp*n_freq+.0+nt),
             1.
         );
     }
@@ -174,8 +181,9 @@ o_ws.onmessage = function(o_e) {
 let o_state = {
     s_msg: '', 
     a_o_msg: [], 
-    o_trn_nor_mouse__last: [.5,.5],
-    o_trn_nor_mouse: [.5,.5]
+    o_trn_nor_mouse_last: [.5,.5],
+    o_trn_nor_mouse: [.5,.5], 
+    o_trn_nor_mouse_follow: [0.,0.]
 }
 window.o_state = o_state
 window.addEventListener('pointermove', (o_e)=>{
@@ -183,16 +191,33 @@ window.addEventListener('pointermove', (o_e)=>{
         (o_e.clientX / window.innerWidth), 
         1.-(o_e.clientY / window.innerHeight), 
     ];
+
     f_update_data_in_o_gpu_gateway(
         {
-            o_trn_nor_mouse: o_state.o_trn_nor_mouse__last,
-            o_trn_nor_mouse__last: o_state.o_trn_nor_mouse
+            o_trn_nor_mouse: o_state.o_trn_nor_mouse_last,
+            o_trn_nor_mouse_last: o_state.o_trn_nor_mouse, 
         }, 
         o_gpu_gateway, 
     )
-    o_state.o_trn_nor_mouse__last = o_state.o_trn_nor_mouse
+    o_state.o_trn_nor_mouse_last = o_state.o_trn_nor_mouse
 })
-
+window.setInterval(()=>{
+    let o_dir = [
+        o_state.o_trn_nor_mouse[0] - o_state.o_trn_nor_mouse_follow[0],
+        o_state.o_trn_nor_mouse[1] - o_state.o_trn_nor_mouse_follow[1],
+    ];
+    let n_t = 0.;
+    o_state.o_trn_nor_mouse_follow = [
+        o_state.o_trn_nor_mouse_follow[0] + n_t*o_dir[0],
+        o_state.o_trn_nor_mouse_follow[1] + n_t*o_dir[1],
+    ]
+    f_update_data_in_o_gpu_gateway(
+        {
+            o_trn_nor_mouse_follow: o_state.o_trn_nor_mouse_follow
+        }, 
+        o_gpu_gateway, 
+    )
+},1000/30)
 // //readme.md:start
 document.body.appendChild(
     await f_o_html__and_make_renderable(
