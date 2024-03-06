@@ -495,7 +495,7 @@ let f_generate_template = async function(
     let o_resp = await fetch(`https://deno.land/x/websersocket`);
     let s_url_latest = o_resp.url;
     let s_uuidv4 = crypto.randomUUID();
-
+    
     let a_s_path = [
         './template/websersocket_{s_uuidv4}.js',
         './template/classes.module.js',
