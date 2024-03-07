@@ -522,6 +522,7 @@ let f_generate_template = async function(
         './template/kill_nohup_deno_run_websersocket{s_uuidv4}.sh': '',
         './template/nohup_deno_run_websersocket{s_uuidv4}.sh': '',
         './template/restart_nohup_run_websersocket{s_uuidv4}.sh': '',
+        './template/process_monitor_websersocket_{s_uuidv4}.sh': '',
         './template/test.js': '',
         './template/.gitignore_tmp_disabled': '',
         './template/o_config.gitignored.examplenotignored.json': '',
@@ -641,6 +642,9 @@ let f_generate_template = async function(
         await Deno.writeTextFile(
             s_path_abs_new,
             s_content,
+            {
+                mode: (s.endsWith('.sh')) ? 0o764 : 0o664
+            }
         )
     }
 
