@@ -524,6 +524,7 @@ let f_generate_template = async function(
         './template/restart_nohup_run_websersocket_{s_uuidv4}.sh': '',
         './template/process_monitor_websersocket_{s_uuidv4}.sh': '',
         './template/test.js': '',
+        './template/generate_markdown_readme.js': '',
         './template/.gitignore_tmp_disabled': '',
         './template/o_config.gitignored.examplenotignored.json': '',
         './template/o_config.gitignored.json': '',
