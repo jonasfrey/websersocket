@@ -2,7 +2,7 @@ import {
     f_display_test_selection_or_run_selected_test_and_print_summary,
     f_o_test, 
     f_assert_equals
-} from "https://deno.land/x/deno_test_server_and_client_side@1.1/mod.js"
+} from "https://deno.land/x/deno_test_server_and_client_side@1.3/mod.js"
 
 //readme.md:start
 //md: ![./logo.png](./logo.png)

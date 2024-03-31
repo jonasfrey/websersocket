@@ -1,1 +1,1 @@
-import * from "./localhost/test_client.module.js";
+import "./localhost/test_client.module.js";
