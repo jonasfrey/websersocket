@@ -518,7 +518,6 @@ let f_generate_template = async function(
 
     let o_s_path_s_content = {
         './template/websersocket_{s_uuidv4}.js': '',
-        './template/classes.module.js': '',
         './template/kill_nohup_deno_run_websersocket_{s_uuidv4}.sh': '',
         './template/nohup_deno_run_websersocket_{s_uuidv4}.sh': '',
         './template/restart_nohup_run_websersocket_{s_uuidv4}.sh': '',
@@ -615,7 +614,12 @@ let f_generate_template = async function(
 // -----END PRIVATE KEY-----`,
         // './template/self_signed_cert_{s_uuidv4}.crt':'',
         // './template/self_signed_key_{s_uuidv4}.key':'',
+        './template/classes.module.js': '',
         './template/functions.module.js': '',
+        './template/runtimedata.module.js': '',
+        './template/localhost/classes.module.js': '',
+        './template/localhost/functions.module.js': '',
+        './template/localhost/runtimedata.module.js': '',
         './template/localhost/client.html': '',
         './template/localhost/client.module.js': '',
         './template/localhost/test_client.html': '',

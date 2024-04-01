@@ -5,8 +5,15 @@ import {
 } from "https://deno.land/x/deno_test_server_and_client_side@1.3/mod.js"
 
 //readme.md:start
-//md: ![./logo.png](./logo.png)
+//md: #template structure
+//md: ## ./
+//md: all but ./localhost inside this directory is considered server side
+//md: ./localhost this is client side code
 //readme.md:end
+
+//./readme.md:start
+//md: ![./logo.png](./logo.png)
+//./readme.md:end
 
 //./readme.md:start
 //md: # Title of the project {s_uuidv4}
