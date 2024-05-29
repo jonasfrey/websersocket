@@ -199,7 +199,7 @@ let f_v_before_return_response__fileserver = async function (
     let o_url = new URL(o_request.url);
     let s_separator = '/';
     // o_url.pathname = o_url.pathname.split(s_separator).filter(v=>v.trim()!='').join(s_separator)
-    let s_path_file_or_folder = `${s_path_prefix}${o_url.pathname}`;
+    let s_path_file_or_folder = `${s_path_prefix}${decodeURIComponent(o_url.pathname)}`;
     let o_stat = null;
     try {
         o_stat = await Deno.stat(s_path_file_or_folder);
