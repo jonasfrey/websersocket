@@ -2,14 +2,17 @@
 import {
     f_websersocket_serve,
     f_v_before_return_response__fileserver
-} from "{s_url_latest}/mod.js"
+} from "https://deno.land/x/websersocket@1.0.3/mod.js"
 
 import {
     O_ws_client
 } from "./classes.module.js"
+import { ensureDir } from "https://deno.land/std@0.224.0/fs/ensure_dir.ts";
 
 import { f_o_config } from "./functions.module.js";
-
+import {
+    f_a_o_entry__from_s_path
+} from "https://deno.land/x/handyhelpers@4.0.7/mod.js"
 
 let s_path_abs_file_current = new URL(import.meta.url).pathname;
 let s_path_abs_folder_current = s_path_abs_file_current.split('/').slice(0, -1).join('/');
@@ -17,8 +20,35 @@ const b_deno_deploy = Deno.env.get("DENO_DEPLOYMENT_ID") !== undefined;
 
 let a_o_ws_client = []
 
+let f_o_fetch_cached = async function( 
+    n_ms_delta_max = 1000*60*5
+){
+    let n_ms_now = new Date().getTime();
+    let a_v_param = Array.from(arguments);
+    let o = await o_kv.get([a_v_param[1]]);
+    let b_update = (o?.value?.n_ms) ? Math.abs(o?.value?.n_ms-n_ms_now) > n_ms_delta_max : true;
+    if(b_update){
+        let o_resp = await fetch(...a_v_param.slice(1));
+        let o_data = await o_resp.json();
+        let o = {
+            n_ms: n_ms_now, 
+            o_data
+        };
+        let b_res = await o_kv.set([a_v_param[1]], o); 
+    }
+    return o?.value?.o_data
+}
+
+const o_kv = await Deno.openKv();
 // let o_config = await f_o_config();
 // console.log({o_config});
+
+let s_api_key = `rtrjRM`
+let s_path_abs_folder_cached_shaders = './localhost/cached_shaders';
+if(!b_deno_deploy){
+
+    await ensureDir(s_path_abs_folder_cached_shaders)// deno deploy is read only...
+}
 
 let f_handler = async function(o_request){
 
@@ -75,6 +105,45 @@ let f_handler = async function(o_request){
             { 
                 headers: {
                     'Content-type': "text/html"
+                }
+            }
+        );
+    }
+    if(o_url.pathname == '/f_a_o_shader'){
+        let n_ms_cache = (
+            o_url.href.includes('#nocache')
+        ) ? 0 : 1000*60*5;
+        let n_ms_now = new Date().getTime();
+        let o = await f_o_fetch_cached(
+            n_ms_cache,
+            `https://www.shadertoy.com/api/v1/shaders/query/shaderclockdenodev?key=${s_api_key}`
+        );
+        // console.log(o)
+        let a_s_id_shader = [
+            ...o.Results,
+            'Dds3WB' , 
+            'MtGSRm'
+            //manually added shaders, (shader must be set to 'public + api' )
+        ];
+
+        let a_o_shader = await Promise.all(a_s_id_shader.map(async s_shader_id=>  {
+
+            let o = await f_o_fetch_cached(
+                n_ms_cache,
+                `https://www.shadertoy.com/api/v1/shaders/${s_shader_id}?key=${s_api_key}`
+            )
+
+            return o
+
+        }));
+        // await Deno.writeTextFile('./localhost/a_o_shader.json', JSON.stringify(a_o_shader))
+        // console.log(a_o_shader)
+
+        return new Response(
+            JSON.stringify(a_o_shader),
+            { 
+                headers: {
+                    'Content-type': "application/json"
                 }
             }
         );
