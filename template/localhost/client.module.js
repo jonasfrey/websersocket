@@ -8,8 +8,9 @@ import {
 
 import {
     f_o_html__and_make_renderable,
-}
-from 'https://deno.land/x/f_o_html_from_o_js@2.9/mod.js'
+}from 'https://deno.land/x/f_o_html_from_o_js@4.0.3/mod.js'
+
+let o_mod_notifire = await import('https://deno.land/x/f_o_html_from_o_js@4.0.3/localhost/jsh_modules/notifire/mod.js');
 
 import {
     f_o_webgl_program,
@@ -22,13 +23,10 @@ import {
     f_s_hms__from_n_ts_ms_utc,
 } from "https://deno.land/x/date_functions@1.4/mod.js"
 
-let a_o_shader = await(await fetch(`./f_a_o_shader${window.location.hash}`)).json(); 
-a_o_shader = a_o_shader.filter(o=>o);
-a_o_shader = a_o_shader.sort((o1, o2)=>{
-    return o2.Shader.info.date - o1.Shader.info.date
-})
+let a_o_shader = []
 let n_idx_a_o_shader = 0;
 let o_state = {
+    o_state_notifire: {},
     n_idx_a_o_shader,
     a_o_shader,
     o_shader: a_o_shader[n_idx_a_o_shader],
@@ -284,3 +282,49 @@ o_ws.onmessage = function(o_e) {
 window.addEventListener('pointerdown', (o_e)=>{
     o_ws.send('pointerdown on client')
 })
+
+
+document.body.appendChild(
+    await f_o_html__and_make_renderable(
+        {
+            style: "max-height: 30vh; overflow-y:scroll",
+            a_o: [
+                {
+                    innerText: "Hello",
+                },
+                o_mod_notifire.f_o_js(
+                    o_state.o_state_notifire
+                ),
+                Object.assign(
+                    o_state, 
+                    {
+                        o_js__a_n: {
+                            f_o_jsh: ()=>{
+                                return {
+                                    f_before_f_o_html__and_make_renderable: (v_o_html)=>{
+                                        console.log('f_before_f_o_html__and_make_renderable')
+                                        console.log(v_o_html)
+                                    },
+                                    f_after_f_o_html__and_make_renderable: (v_o_html)=>{
+                                        console.log('f_after_f_o_html__and_make_renderable')
+                                        console.log(v_o_html)
+                                    },
+                                    a_o: [
+                                        ...new Array(10).fill(0).map(n=>{
+                                            return {
+                                                s_tag: "input",
+                                                style: "width: 100%", 
+                                                value: `${n}: rand:${Math.random()}`
+                                            } 
+                                        })
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                ).o_js__a_n
+            ]
+        }
+    )
+)
+o_mod_notifire.f_o_throw_notification(o_state.o_state_notifire,'hello!')
