@@ -26,10 +26,10 @@ import {
 let a_o_shader = []
 let n_idx_a_o_shader = 0;
 let o_state = {
+    o_shader: {},
     o_state_notifire: {},
     n_idx_a_o_shader,
     a_o_shader,
-    o_shader: a_o_shader[n_idx_a_o_shader],
 }
 
 window.o_state = o_state
@@ -69,29 +69,6 @@ let o_canvas = document.createElement('canvas'); // or document.querySelector("#
 document.body.appendChild(o_canvas);
 
 
-let f_s_glsl_from_o_shader = function(
-    o_shader
-){
-
-    let s_code = o_shader.Shader.renderpass[0].code;
-    console.log(s_code)
-    let n_idx1 = s_code.indexOf('//IMPORTANT START')
-    let n_idx2 = s_code.indexOf('//IMPORTANT END', n_idx1);
-    if(n_idx1 != -1 && n_idx2!=-1){
-        return `
-        // const vec4 iMouse = iMouse;
-        // const float iTime = iDate.w;
-        // const vec2 iResolution = iResolution;
-        // const vec2 fragCoord = gl_FragCoord.xy;
-        // const vec4 iDate = iDate;
-        ${s_code.substring(0, n_idx1)}
-        void main() {
-        ${s_code.substring(n_idx2)}
-        `
-    }else{
-        return 'shader could not be rewritten to fit into the app'
-    }
-}
 let o_webgl_program = null;
 let f_update_shader = function(){
 
@@ -114,14 +91,22 @@ let f_update_shader = function(){
         uniform vec2 iResolution;
         uniform vec4 iDate;
     
-        ${o_state.o_shader.Shader.renderpass[0].code}
-        
+
         void main() {
-            vec2 fragCoord = gl_FragCoord.xy;
-            mainImage(fragColor, fragCoord);  
+            float n_scl_min = min(iResolution.x, iResolution.y);
+            vec2 o_trn = (gl_FragCoord.xy-iResolution.xy*.5)/n_scl_min;
+            float n = length(o_trn);
+            float na = atan(o_trn.x, o_trn.y);
+            fragColor = vec4(
+                sin(n*18.6+iTime+sin(na*3.)),
+                sin(n*19.2+iTime+sin(na*3.)),
+                sin(n*19.8+iTime+sin(na*3.)),
+                sin(n*18.+iTime+na)
+            );
         }
         `
     )
+    
     o_state.o_ufloc__iResolution = o_webgl_program?.o_ctx.getUniformLocation(o_webgl_program?.o_shader__program, 'iResolution');
     o_state.o_ufloc__iDate = o_webgl_program?.o_ctx.getUniformLocation(o_webgl_program?.o_shader__program, 'iDate');
     o_state.o_ufloc__iMouse = o_webgl_program?.o_ctx.getUniformLocation(o_webgl_program?.o_shader__program, 'iMouse');
