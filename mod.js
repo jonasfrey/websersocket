@@ -9,7 +9,7 @@ import { isAbsolute as f_b_path_is_absolute } from "https://deno.land/std@0.50.0
 import { contentType as f_s_response_header_content_type__from_s } from "https://deno.land/std@0.208.0/media_types/content_type.ts";
 
 import {
-    f_o_html__and_make_renderable
+    await f_o_html__and_make_renderable
 } from "https://deno.land/x/f_o_html_from_o_js@5.0.0/mod.js"
 
 import {
@@ -238,7 +238,7 @@ let f_v_before_return_response__fileserver = async function (
             .filter(s => s.trim() != '')
 
         // console.log(a_s_path_part)
-        v_body = f_o_html__and_make_renderable(
+        v_body = await f_o_html__and_make_renderable(
             {
                 style: "font-family:monospace;font-size:1.2rem;display:flex;flex-direction:column;",
                 a_o: [
@@ -420,7 +420,7 @@ let f_v_before_return_response__fileserver = async function (
                 // "Non-standard Deprecated": null,
                 // "Content-Encoding": null,
                 // "Content-Language": null,
-                "Content-Length": v_body.length,
+                "Content-Length": v_body?.length,
                 // "Content-Location": null,
                 // "Content-Range": null,
                 // "Content-Security-Policy": null,
