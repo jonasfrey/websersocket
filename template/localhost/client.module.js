@@ -8,20 +8,20 @@ import {
 
 import {
     f_o_html__and_make_renderable,
-}from 'https://deno.land/x/f_o_html_from_o_js@4.0.3/mod.js'
+}from 'https://deno.land/x/f_o_html_from_o_js@5.0.0/mod.js'
 
-let o_mod_notifire = await import('https://deno.land/x/f_o_html_from_o_js@4.0.3/localhost/jsh_modules/notifire/mod.js');
+let o_mod_notifire = await import('https://deno.land/x/f_o_html_from_o_js@5.0.0/localhost/jsh_modules/notifire/mod.js');
 
 import {
     f_o_webgl_program,
     f_delete_o_webgl_program,
     f_resize_canvas_from_o_webgl_program,
     f_render_from_o_webgl_program
-} from "https://deno.land/x/handyhelpers@4.0.7/mod.js"
+} from "https://deno.land/x/handyhelpers@5.0.0/mod.js"
 
 import {
     f_s_hms__from_n_ts_ms_utc,
-} from "https://deno.land/x/date_functions@1.4/mod.js"
+} from "https://deno.land/x/date_functions@1.4/mod.js"  
 
 let a_o_shader = []
 let n_idx_a_o_shader = 0;
