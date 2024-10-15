@@ -10,11 +10,11 @@ import { contentType as f_s_response_header_content_type__from_s } from "https:/
 
 import {
     f_o_html__and_make_renderable
-} from "https://deno.land/x/f_o_html_from_o_js@1.9/mod.js"
+} from "https://deno.land/x/f_o_html_from_o_js@5.0.0/mod.js"
 
 import {
     f_s_n_beautified
-} from "https://deno.land/x/handyhelpers@2.2/mod.js"
+} from "https://deno.land/x/handyhelpers@5.0.0/mod.js"
 import { ensureDir as f_ensure_folder } from "https://deno.land/std@0.218.2/fs/ensure_dir.ts";
 
 
@@ -368,7 +368,7 @@ let f_v_before_return_response__fileserver = async function (
                                     }).reverse()
                                     return {
                                         s_tag: "tr",
-                                        onclick: `window.location.href = '${s_href}'`,
+                                        onclick: `globalThis.location.href = '${s_href}'`,
                                         a_o: [
                                             {
                                                 s_tag: 'td',

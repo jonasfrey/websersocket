@@ -4,7 +4,7 @@ import {
     f_s_css_prefixed,
     o_variables, 
     f_s_css_from_o_variables
-} from "https://deno.land/x/f_add_css@1.1/mod.js"
+} from "https://deno.land/x/f_add_css@2.0.0/mod.js"
 
 import {
     f_o_html__and_make_renderable,
@@ -21,7 +21,7 @@ import {
 
 import {
     f_s_hms__from_n_ts_ms_utc,
-} from "https://deno.land/x/date_functions@1.4/mod.js"  
+} from "https://deno.land/x/date_functions@2.0.0/mod.js"  
 
 let a_o_shader = []
 let n_idx_a_o_shader = 0;
@@ -32,7 +32,7 @@ let o_state = {
     a_o_shader,
 }
 
-window.o_state = o_state
+globalThis.o_state = o_state
 o_variables.n_rem_font_size_base = 1. // adjust font size, other variables can also be adapted before adding the css to the dom
 o_variables.n_rem_padding_interactive_elements = 0.5; // adjust padding for interactive elements 
 f_add_css(
@@ -124,20 +124,20 @@ let f_resize = function(){
         // this will resize the canvas and also update 'o_scl_canvas'
         f_resize_canvas_from_o_webgl_program(
             o_webgl_program,
-            window.innerWidth, 
-            window.innerHeight
+            globalThis.innerWidth, 
+            globalThis.innerHeight
         )
     
         o_webgl_program?.o_ctx.uniform2f(o_state.o_ufloc__iResolution,
-            window.innerWidth, 
-            window.innerHeight
+            globalThis.innerWidth, 
+            globalThis.innerHeight
         );
     
         f_render_from_o_webgl_program(o_webgl_program);
     }
 }
 
-window.addEventListener('resize', ()=>{
+globalThis.addEventListener('resize', ()=>{
     f_resize();
 });
 
@@ -199,7 +199,7 @@ let f_raf = function(){
         let s_time = `${f_s_hms__from_n_ts_ms_utc(o_date.getTime(), 'UTC')}.${((o_date.getTime()/1000)%1).toFixed(3).split('.').pop()}`
         o_el_time.innerText = `UTC: ${s_time}`
     
-        let n_ms = window.performance.now()
+        let n_ms = globalThis.performance.now()
         let n_ms_delta = Math.abs(n_ms_update_time_last - n_ms);
         if(n_ms_delta > n_ms_update_time_delta_max){
             document.title = `${s_time.split('.').shift()} Shader-Clock` 
@@ -215,14 +215,14 @@ n_id_raf = requestAnimationFrame(f_raf)
 
 
 let n_id_timeout = 0;
-window.onpointermove = function(){
+globalThis.onpointermove = function(){
     clearTimeout(n_id_timeout);
     o_el_time.style.display = 'block'
     n_id_timeout = setTimeout(()=>{
         o_el_time.style.display = 'none'
     },5000)
 }
-window.onpointerdown = function(){
+globalThis.onpointerdown = function(){
     o_state.n_idx_a_o_shader = (o_state.n_idx_a_o_shader+1)% o_state.a_o_shader.length;
     o_state.o_shader = o_state.a_o_shader[o_state.n_idx_a_o_shader]
     f_update_shader();
@@ -231,11 +231,11 @@ f_update_shader()
 
 
 // Determine the current domain
-const s_hostname = window.location.hostname;
+const s_hostname = globalThis.location.hostname;
 
 // Create the WebSocket URL, assuming ws for http and wss for https
-const s_protocol_ws = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-const s_url_ws = `${s_protocol_ws}//${s_hostname}:${window.location.port}`;
+const s_protocol_ws = globalThis.location.protocol === 'https:' ? 'wss:' : 'ws:';
+const s_url_ws = `${s_protocol_ws}//${s_hostname}:${globalThis.location.port}`;
 
 // Create a new WebSocket instance
 const o_ws = new WebSocket(s_url_ws);
@@ -264,7 +264,7 @@ o_ws.onmessage = function(o_e) {
     o_state?.o_js__a_o_mod?._f_render();
 
 };
-window.addEventListener('pointerdown', (o_e)=>{
+globalThis.addEventListener('pointerdown', (o_e)=>{
     o_ws.send('pointerdown on client')
 })
 

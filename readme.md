@@ -44,7 +44,7 @@ await f_websersocket_serve(
                 // important if the connection is secure (https), 
                 // the socket has to be opened with the wss:// protocol
                 // from the client
-                // for client: const socket = new WebSocket(`${window.location.protocol.replace('http', 'ws')}//${window.location.host}`);
+                // for client: const socket = new WebSocket(`${globalThis.location.protocol.replace('http', 'ws')}//${globalThis.location.host}`);
                 if(o_request.headers.get('Upgrade') == 'websocket'){
 
                     const { 

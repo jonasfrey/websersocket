@@ -7,7 +7,7 @@
     <script type="module">
 
         // Create WebSocket connection.
-        const socket = new WebSocket(`${window.location.protocol.replace('https', 'ws')}//${window.location.host}`);
+        const socket = new WebSocket(`${globalThis.location.protocol.replace('https', 'ws')}//${globalThis.location.host}`);
 
         // Connection opened
         socket.addEventListener("open", (event) => {
