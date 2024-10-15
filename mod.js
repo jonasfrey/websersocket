@@ -9,7 +9,7 @@ import { isAbsolute as f_b_path_is_absolute } from "https://deno.land/std@0.50.0
 import { contentType as f_s_response_header_content_type__from_s } from "https://deno.land/std@0.208.0/media_types/content_type.ts";
 
 import {
-    await f_o_html__and_make_renderable
+    f_o_html__and_make_renderable
 } from "https://deno.land/x/f_o_html_from_o_js@5.0.0/mod.js"
 
 import {
