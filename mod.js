@@ -214,6 +214,7 @@ let f_v_before_return_response__fileserver = async function (
 
     if (o_stat.isFile) {
         let a_n_u8__file = await Deno.readFile(s_path_file_or_folder);
+        console.log(a_n_u8__file)
         s_resp_header_content_type = f_s_response_header_content_type__from_s(
             s_path_file_or_folder?.split('/').pop().split('.').pop()
         )
@@ -238,172 +239,177 @@ let f_v_before_return_response__fileserver = async function (
             .filter(s => s.trim() != '')
 
         // console.log(a_s_path_part)
-        v_body = await f_o_html__and_make_renderable(
-            {
-                style: "font-family:monospace;font-size:1.2rem;display:flex;flex-direction:column;",
-                a_o: [
-                    {
-                        s_tag: "style", 
-                        innerHTML: `
-                        html{
-                            font-family:monospace;
-                            font-size:1.2rem;
-                        }
-                        table{
-                            font-size:1.2rem;
-                        }
-                        body {
-                            background-color: #121212; /* Dark background */
-                            color: #e0e0e0; /* Light text color */
-                        }
-                        a {
-                            color: #93bdf9; 
-                            text-decoration: none; /* Optional: Removes underline from links */
-                        }
-                        
-                        a:hover {
-                            color: #ff79c6; /* Different color when hovering */
-                            text-decoration: underline;
-                        }
-                        
-                        a:active {
-                            color: #ff5555; /* Different color when link is clicked */
-                        }
-                        
-                        a:visited {
-                            color: #bd93f9; /* Different color for visited links */
-                        }
-                        th, td{
-                            padding: 0.3rem;
-                            text-align:end;
-                        }
-                        tr:hover{
-                            background:#323232
-                        }
-                        `
-                    },
-                    {
-                        style: "display:flex;flex-direction:row;",
-                        s_tag: 'h1',
-                        a_o: [
+        let o = {
+            style: "font-family:monospace;font-size:1.2rem;display:flex;flex-direction:column;",
+            a_o: [
+                {
+                    s_tag: "style", 
+                    innerHTML: `
+                    html{
+                        font-family:monospace;
+                        font-size:1.2rem;
+                    }
+                    table{
+                        font-size:1.2rem;
+                    }
+                    body {
+                        background-color: #121212; /* Dark background */
+                        color: #e0e0e0; /* Light text color */
+                    }
+                    a {
+                        color: #93bdf9; 
+                        text-decoration: none; /* Optional: Removes underline from links */
+                    }
+                    
+                    a:hover {
+                        color: #ff79c6; /* Different color when hovering */
+                        text-decoration: underline;
+                    }
+                    
+                    a:active {
+                        color: #ff5555; /* Different color when link is clicked */
+                    }
+                    
+                    a:visited {
+                        color: #bd93f9; /* Different color for visited links */
+                    }
+                    th, td{
+                        padding: 0.3rem;
+                        text-align:end;
+                    }
+                    tr:hover{
+                        background:#323232
+                    }
+                    `
+                },
+                {
+                    style: "display:flex;flex-direction:row;",
+                    s_tag: 'h1',
+                    a_o: [
+                        {
+                            innerHTML: 'Index of&nbsp;',
+                        },
+                        ...a_s_path_part.map((s, n_idx) => {
+                            return {
+                                style: "display:flex;flex-direction:row;",
+                                a_o: [
+                                    {
+                                        innerText: '/'
+                                    },
+                                    {
+                                        s_tag: 'a',
+                                        href: [
+                                            (n_idx > 0) ? '/' : '',
+                                            a_s_path_part
+                                                .slice(1, n_idx + 1)
+                                                .join(s_separator) + '/',
+                                        ].join(''),
+                                        innerText: s
+                                    },
+
+                                ]
+                            }
+
+                        }),
+                        {
+                            innerText: '/'
+                        },
+                    ],
+                },
+                {
+                    s_tag: 'table',
+                    a_o: [
+                        {
+                            s_tag: 'tr',
+                            a_o: [
+                                { s_tag: 'th', innerText: 'Mode' },
+                                { s_tag: 'th', innerText: 'Size' },
+                                { s_tag: 'th', innerText: 'Name' },
+                            ]
+                        },
+                        ...[
+                            Object.assign(
+                                o_stat,
+                                { name: '.' }
+                            ),
                             {
-                                innerHTML: 'Index of&nbsp;',
+                                name: '..',
+                                isDirectory: true,
+
                             },
-                            ...a_s_path_part.map((s, n_idx) => {
+                            ...a_o_entry,
+                        ].map(
+                            o => {
+                                // console.log(o)
+                                let s_href = `${o_url
+                                        .pathname
+                                        .split(s_separator)
+                                        .filter(v => v.trim() != '')
+                                        .join(s_separator)
+                                    }/${o.name}${(o.isDirectory) ? '/' : ''}`
+                                if (!s_href.startsWith('/')) {
+                                    s_href = `/${s_href}`
+                                }
+                                let s_type = [
+                                    (o.isFile) ? '-' : false,
+                                    (o.isDirectory) ? 'd' : false,
+                                    (o.isSymlink) ? 'l' : false,
+                                    (o.isBlockDevice) ? 'b' : false,
+                                    (o.isCharDevice) ? 'c' : false,
+                                    (o.isFifo) ? 'p' : false,
+                                    (o.isSocket) ? 's' : false,
+                                ].filter(v => v).join('')
+                                let a_s_permission = new Array(3).fill(0).map((n, n_idx) => {
+                                    return [
+                                        (o.mode & (0b1 << (n_idx * 3 + 2))) ? 'r' : '-',
+                                        (o.mode & (0b1 << (n_idx * 3 + 1))) ? 'w' : '-',
+                                        (o.mode & (0b1 << (n_idx * 3 + 0))) ? 'x' : '-',
+                                    ].join('');
+                                }).reverse()
                                 return {
-                                    style: "display:flex;flex-direction:row;",
+                                    s_tag: "tr",
+                                    onclick: `globalThis.location.href = '${s_href}'`,
                                     a_o: [
                                         {
-                                            innerText: '/'
+                                            s_tag: 'td',
+                                            innerText: `${s_type}${a_s_permission.join(' ')}`
                                         },
                                         {
-                                            s_tag: 'a',
-                                            href: [
-                                                (n_idx > 0) ? '/' : '',
-                                                a_s_path_part
-                                                    .slice(1, n_idx + 1)
-                                                    .join(s_separator) + '/',
-                                            ].join(''),
-                                            innerText: s
+                                            s_tag: 'td',
+                                            innerText: (o.size) ?
+                                                `${f_s_n_beautified(o.size)} B`
+                                                : ''
                                         },
-
+                                        {
+                                            s_tag: 'td',
+                                            a_o: [
+                                                {
+                                                    s_tag: 'a',
+                                                    href: s_href,
+                                                    innerText: o.name
+                                                }
+                                            ]
+                                        },
                                     ]
+
                                 }
+                            }
+                        )
 
-                            }),
-                            {
-                                innerText: '/'
-                            },
-                        ],
-                    },
-                    {
-                        s_tag: 'table',
-                        a_o: [
-                            {
-                                s_tag: 'tr',
-                                a_o: [
-                                    { s_tag: 'th', innerText: 'Mode' },
-                                    { s_tag: 'th', innerText: 'Size' },
-                                    { s_tag: 'th', innerText: 'Name' },
-                                ]
-                            },
-                            ...[
-                                Object.assign(
-                                    o_stat,
-                                    { name: '.' }
-                                ),
-                                {
-                                    name: '..',
-                                    isDirectory: true,
+                    ]
+                }
 
-                                },
-                                ...a_o_entry,
-                            ].map(
-                                o => {
-                                    // console.log(o)
-                                    let s_href = `${o_url
-                                            .pathname
-                                            .split(s_separator)
-                                            .filter(v => v.trim() != '')
-                                            .join(s_separator)
-                                        }/${o.name}${(o.isDirectory) ? '/' : ''}`
-                                    if (!s_href.startsWith('/')) {
-                                        s_href = `/${s_href}`
-                                    }
-                                    let s_type = [
-                                        (o.isFile) ? '-' : false,
-                                        (o.isDirectory) ? 'd' : false,
-                                        (o.isSymlink) ? 'l' : false,
-                                        (o.isBlockDevice) ? 'b' : false,
-                                        (o.isCharDevice) ? 'c' : false,
-                                        (o.isFifo) ? 'p' : false,
-                                        (o.isSocket) ? 's' : false,
-                                    ].filter(v => v).join('')
-                                    let a_s_permission = new Array(3).fill(0).map((n, n_idx) => {
-                                        return [
-                                            (o.mode & (0b1 << (n_idx * 3 + 2))) ? 'r' : '-',
-                                            (o.mode & (0b1 << (n_idx * 3 + 1))) ? 'w' : '-',
-                                            (o.mode & (0b1 << (n_idx * 3 + 0))) ? 'x' : '-',
-                                        ].join('');
-                                    }).reverse()
-                                    return {
-                                        s_tag: "tr",
-                                        onclick: `globalThis.location.href = '${s_href}'`,
-                                        a_o: [
-                                            {
-                                                s_tag: 'td',
-                                                innerText: `${s_type}${a_s_permission.join(' ')}`
-                                            },
-                                            {
-                                                s_tag: 'td',
-                                                innerText: (o.size) ?
-                                                    `${f_s_n_beautified(o.size)} B`
-                                                    : ''
-                                            },
-                                            {
-                                                s_tag: 'td',
-                                                a_o: [
-                                                    {
-                                                        s_tag: 'a',
-                                                        href: s_href,
-                                                        innerText: o.name
-                                                    }
-                                                ]
-                                            },
-                                        ]
-
-                                    }
-                                }
-                            )
-
-                        ]
-                    }
-
-                ]
-            }
-        ).outerHTML
+            ]
+        }
+        let o_html = await f_o_html__and_make_renderable(
+            o
+        )
+        console.log(o_html.outerHTML);
+        v_body = o_html.outerHTML
         s_resp_header_content_type = 'text/html'
     }
+    // console.log(v_body)
+    // console.log(v_body.length)
     // console.log(o_url)
     // console.log(v_body)
     // var o_response = await fetch(s_url_new);
@@ -420,7 +426,7 @@ let f_v_before_return_response__fileserver = async function (
                 // "Non-standard Deprecated": null,
                 // "Content-Encoding": null,
                 // "Content-Language": null,
-                "Content-Length": v_body?.length,
+                "Content-Length": v_body.length,
                 // "Content-Location": null,
                 // "Content-Range": null,
                 // "Content-Security-Policy": null,

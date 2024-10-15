@@ -2,7 +2,7 @@
 import {
     f_websersocket_serve,
     f_v_before_return_response__fileserver
-} from "https://deno.land/x/websersocket@3.0.1/mod.js"
+} from "https://deno.land/x/websersocket@5.0.0/mod.js"
 
 import {
     O_ws_client
