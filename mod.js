@@ -214,7 +214,7 @@ let f_v_before_return_response__fileserver = async function (
 
     if (o_stat.isFile) {
         let a_n_u8__file = await Deno.readFile(s_path_file_or_folder);
-        console.log(a_n_u8__file)
+        // console.log(a_n_u8__file)
         s_resp_header_content_type = f_s_response_header_content_type__from_s(
             s_path_file_or_folder?.split('/').pop().split('.').pop()
         )
@@ -404,7 +404,7 @@ let f_v_before_return_response__fileserver = async function (
         let o_html = await f_o_html__and_make_renderable(
             o
         )
-        console.log(o_html.outerHTML);
+        // console.log(o_html.outerHTML);
         v_body = o_html.outerHTML
         s_resp_header_content_type = 'text/html'
     }
