@@ -499,7 +499,7 @@ let f_generate_template = async function(
     if(!b){
         Deno.exit(1)
     }
-    let s_url_folder_gitrepo = `https://raw.githubusercontent.com/jonasfrey/websersocket/main`
+    let s_url_folder_gitrepo = `https://raw.githubusercontent.com/jonasfrey/websersocket/refs/heads/main`
 
     let o_resp = await fetch(`https://deno.land/x/websersocket`);
     let s_url_latest = o_resp.url;
